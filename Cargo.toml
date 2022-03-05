@@ -1,0 +1,10 @@
+[package]
+name = "joykbd"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+evdev = { version = "0.11.5", features = ["tokio"] }
+clap = { version = "3.1", features = ["derive"] }
+anyhow = "1"
+tokio = { version = "1", features = ["macros", "rt", "time"] }
