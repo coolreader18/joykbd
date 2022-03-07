@@ -18,20 +18,24 @@ struct Args {
     /// The repeat timeout for the pseudo-mouse, in milliseconds
     #[clap(long, default_value_t = 16)]
     repeat_timeout: u64,
+    /// The minimum value that the magnitude of the stick reading has to be so it's not ignored as
+    /// joy-con drift.
     #[clap(long, default_value_t = 2000)]
     drift_threshold: u32,
+    /// A bias to add to the X axis of the stick before further processing.
     #[clap(long, allow_hyphen_values = true, default_value_t = 0)]
-    adjust_x: i32,
+    x_bias: i32,
+    /// A bias to add to the Y axis of the stick before further processing.
     #[clap(long, allow_hyphen_values = true, default_value_t = 0)]
-    adjust_y: i32,
+    y_bias: i32,
 }
 
 impl Args {
     fn stick_constants(&self) -> StickConstants {
         StickConstants {
-            factor: self.speed / 30_000f64.powi(5),
+            factor: self.speed / 30_000f64.powi(StickConstants::CURVE_POWER),
             drift_threshold: self.drift_threshold,
-            adjustments: (self.adjust_x, self.adjust_y),
+            axis_bias: (self.x_bias, self.y_bias),
         }
     }
 }
@@ -39,7 +43,7 @@ impl Args {
 struct StickConstants {
     factor: f64,
     drift_threshold: u32,
-    adjustments: (i32, i32),
+    axis_bias: (i32, i32),
 }
 
 enum Axis {
@@ -51,15 +55,17 @@ impl StickConstants {
     fn map_axis(&self, axis: Axis, value: i32) -> i32 {
         let value = value
             + match axis {
-                Axis::X => self.adjustments.0,
-                Axis::Y => self.adjustments.1,
+                Axis::X => self.axis_bias.0,
+                Axis::Y => self.axis_bias.1,
             };
         if value.unsigned_abs() < self.drift_threshold {
             0
         } else {
-            (f64::from(value).powi(5) * self.factor) as i32
+            (f64::from(value).powi(Self::CURVE_POWER) * self.factor) as i32
         }
     }
+
+    const CURVE_POWER: i32 = 5;
 }
 
 #[tokio::main(flavor = "current_thread")]

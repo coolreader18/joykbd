@@ -19,8 +19,9 @@ joykbd /dev/input/eventNN
 # so, leaving the device path out should be fine in most cases
 joykbd
 # if the cursor tends to like going to the right more then the left, set
-# --adjust-x with a negative value. Vice-versa for leaning left more than right.
-joykbd --adjust-x -2000
+# --x-bias with a negative value. Vice-versa for leaning left more than right,
+# and same with --y-bias for the Y axis
+joykbd --x-bias -2000
 # if you have bad joycon drift, set --drift-threshold. Axis readings where
 # abs(value) < drift-threshold will be ignored. Note that this also makes the
 # pointing device less sensitive, unfortunately.
