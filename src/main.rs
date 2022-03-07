@@ -20,9 +20,9 @@ struct Args {
     repeat_timeout: u64,
     #[clap(long, default_value_t = 2000)]
     drift_threshold: u32,
-    #[clap(long, default_value_t = 0)]
+    #[clap(long, allow_hyphen_values = true, default_value_t = 0)]
     adjust_x: i32,
-    #[clap(long, default_value_t = 0)]
+    #[clap(long, allow_hyphen_values = true, default_value_t = 0)]
     adjust_y: i32,
 }
 
